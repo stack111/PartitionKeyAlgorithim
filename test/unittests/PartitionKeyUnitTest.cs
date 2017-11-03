@@ -15,8 +15,10 @@ namespace unittests
         }
         
         [Theory]
-        [InlineData(100000, 2000, -1, 0.02, 0.25)]
-        public void Validate(int numberOfRows, uint buckets, int bucketCountStepUp, double percent, double delta)
+        [InlineData(1000, 100, -1, 1, 1.1)]
+        [InlineData(10000000, 100, -1, 1, 1.1)]
+        [InlineData(100000000, 5000, -1, 1, 1.1)]
+        public void Validate(uint numberOfRows, uint buckets, int bucketCountStepUp, double percent, double delta)
         {
             Dictionary<uint, uint> map = new Dictionary<uint, uint>();
             int rowCounter = 0;
@@ -32,13 +34,14 @@ namespace unittests
                 if(map.ContainsKey(bucket)) 
                     map[bucket]++;
                 else map[bucket] = 1;
+                rowCounter++;
             }
             
             double lower = percent - delta;
             double higher = percent + delta;
             foreach(var bucket in map)
             {
-                double percentOfTotal =  (double)bucket.Value / (double)numberOfRows;
+                double percentOfTotal =  ((double)bucket.Value / (double)numberOfRows) * 100;
                 _output.WriteLine("{0} {1} {2}", percentOfTotal, lower, higher);
                 Assert.InRange(percentOfTotal, lower, higher);
             }
